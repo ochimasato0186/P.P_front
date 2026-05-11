@@ -1,8 +1,12 @@
 ## 環境構築
 
 手順１、Node,jsをインストールする
-
 https://nodejs.org/ja/download
+
+ターミナルにて以下を実行してください
+```bash
+npm run dev
+```
 
 ## Getting Started
 
