@@ -3,10 +3,32 @@
 手順１、Node,jsをインストールする
 https://nodejs.org/ja/download
 
-ターミナルにて以下を実行してください
+手順２、ターミナルにて以下を実行してください
+```bash
+node -v
+```
+```bash
+npm -v
+```
+バージョンが出ればOKです。
+npmでエラーが出た場合以下のコマンドを実行してください！
+```bash
+npm install
+```
+手順３、Cドライブにフォルダーを作成し、このGitHubをクローンしてください！
+
+手順４、開発サーバー起動及びブラウザ確認
+```bash
+cd P.Pfront
+```
+↓
 ```bash
 npm run dev
 ```
+↓
+
+http://localhost:3000
+
 
 ## Getting Started
 
