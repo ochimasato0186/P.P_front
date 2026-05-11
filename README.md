@@ -1,6 +1,7 @@
 ## 環境構築
 
-手順１、Node,jsをインストールする.
+手順１、Node,jsをインストールする
+
 https://nodejs.org/ja/download
 
 ## Getting Started
