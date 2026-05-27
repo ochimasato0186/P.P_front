@@ -12,7 +12,7 @@ function getBackgroundColor(hour: number) {
     }
     // 10:00~16:00はグラデーション
     if (hour >= 10 && hour < 16) {
-        return "linear-gradient(180deg, #18B3F0 0%, #afeeee 50%)";
+        return "linear-gradient(180deg, #4169e1 0%, #265780 100%)";
     }
     // 16:00~18:00はグラデーション
     if (hour >= 16 && hour < 18) {
@@ -26,7 +26,7 @@ function getBackgroundColor(hour: number) {
     if (hour >= 19 && hour < 21) {
         return "linear-gradient(180deg, #BA55D3 0%, #F4A460 25%, #648888 65%)";
     }
-    return "linear-gradient(180deg, #4682BF 0%, #265780 100%)";// 21:00~5:00
+    return "linear-gradient(180deg, #BA55D3 0%, #648888 65%)";// 21:00~5:00
 }
 
 export default function PhoneFrame({ children, visible = true }: Props) {
