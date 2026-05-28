@@ -39,8 +39,8 @@ export default function TimeButton({ label, onClick, hour, style }: TimeButtonPr
         marginTop: 24,
         cursor: "pointer",
         transition: "background 0.3s, border 0.3s",
+        border: isMorning ? "2px solid #fff" : "none",
         ...style,
-        border: isMorning ? "2px solid #fff" : "none", // 最後に指定して上書き
       }}
     >
       {label}
