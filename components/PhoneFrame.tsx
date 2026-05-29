@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
+// フレームON/OFFを子で判定できるようcontextを用意
+export const FrameContext = createContext(true);
 type Props = {
   /**
    * 通常のchildren、またはrender propsとして(bgColor: string, hour: number)を受け取る関数
@@ -52,19 +54,21 @@ export default function PhoneFrame({ children, visible = true }: Props) {
       ? (children as (bg: string, hour: number) => React.ReactNode)(bgColor, hour)
       : children;
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          width: "100vw",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: isGradient ? undefined : bgColor,
-          backgroundImage: isGradient ? bgColor : undefined,
-        }}
-      >
-        {content}
-      </div>
+      <FrameContext.Provider value={false}>
+        <div
+          style={{
+            minHeight: "100vh",
+            width: "100vw",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: isGradient ? undefined : bgColor,
+            backgroundImage: isGradient ? bgColor : undefined,
+          }}
+        >
+          {content}
+        </div>
+      </FrameContext.Provider>
     );
   }
   // グラデーションの場合はbackgroundImageで指定
@@ -72,20 +76,22 @@ export default function PhoneFrame({ children, visible = true }: Props) {
   // childrenが関数ならrender propsとして呼び出す
   const content = typeof children === "function" ? (children as (bg: string, hour: number) => React.ReactNode)(bgColor, hour) : children;
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.frame}>
-        <div style={styles.notch} />
-        <div
-          style={{
-            ...styles.screen,
-            background: isGradient ? undefined : bgColor,
-            backgroundImage: isGradient ? bgColor : undefined,
-          }}
-        >
-          {content}
+    <FrameContext.Provider value={true}>
+      <div style={styles.wrapper}>
+        <div style={styles.frame}>
+          <div style={styles.notch} />
+          <div
+            style={{
+              ...styles.screen,
+              background: isGradient ? undefined : bgColor,
+              backgroundImage: isGradient ? bgColor : undefined,
+            }}
+          >
+            {content}
+          </div>
         </div>
       </div>
-    </div>
+    </FrameContext.Provider>
   );
 }
 
@@ -117,7 +123,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "10px",
   },
   screen: {
+    position: "relative",
     display: "flex",
+     flexDirection: "column", 
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
