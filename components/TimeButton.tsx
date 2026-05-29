@@ -19,27 +19,33 @@ export function getButtonColor(hour: number) {
 
 export type TimeButtonProps = {
   label: string;
-  onClick?: () => void;
+  onClick?: (value?: any) => void;
   hour: number;
   style?: React.CSSProperties;
+  value?: any;
 };
 
-export default function TimeButton({ label, onClick, hour, style }: TimeButtonProps) {
+export default function TimeButton({ label, onClick, hour, style, value }: TimeButtonProps) {
   // 5:00~10:00だけ白いボーダー
   const isMorning = hour >= 5 && hour < 10;
   return (
     <button
-      onClick={onClick}
+      onClick={onClick ? () => onClick(value) : undefined}
       style={{
         background: getButtonColor(hour),
         color: "#fff",
-        borderRadius: 8,
+        borderRadius: 24,
         padding: "12px 24px",
         fontSize: 16,
         marginTop: 24,
         cursor: "pointer",
         transition: "background 0.3s, border 0.3s",
         border: isMorning ? "2px solid #fff" : "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+        boxShadow: "0 2px 12px #0002",
         ...style,
       }}
     >

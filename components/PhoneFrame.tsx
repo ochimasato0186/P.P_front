@@ -117,6 +117,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "10px",
   },
   screen: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     width: "100%",
     height: "100%",
     borderRadius: "28px",
