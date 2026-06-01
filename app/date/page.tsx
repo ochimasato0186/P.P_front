@@ -47,7 +47,7 @@ export default function DatePage() {
           </div>
           <TimeBox hour={hour} width={300} height={100} style={{ marginBottom: 4 }}>正答率</TimeBox>
           <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: 0 }}>
-            <TimeButton label="RETRY" hour={hour} />
+            <TimeButton label="RETRY" hour={hour} onClick={() => router.push("/quiz")} />
           </div>
           <button
             type="button"

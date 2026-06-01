@@ -34,9 +34,14 @@ export default function HomePage() {
             flexDirection: "column",
           }}
         >
-          <h1 style={{ marginBottom: 8 }}>自転車クイズ</h1>//タイトル
+          <h1 style={{ marginBottom: 8 }}>自転車クイズ</h1>
           <div style={{ width: 200, height: 4, background: '#222', borderRadius: 2, marginBottom: 16 }} />
-          <TimeButton label="START" hour={hour} style={{ width: 200, height: 50 }} />
+          <TimeButton
+            label="START"
+            hour={hour}
+            style={{ width: 200, height: 50 }}
+            onClick={() => router.push("/quiz")}
+          />
           <div style={{ height: 24 }} />
           <TimeBox hour={hour} width={260} height={130}>最高正答率</TimeBox>
           <button
