@@ -1,4 +1,3 @@
-
 "use client";
 import { useRouter } from "next/navigation";
 import TimeButton from "../../components/TimeButton";
@@ -7,6 +6,7 @@ import { useContext } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
+import TimeBox from "../../components/TimeBox";
 
 export default function HomePage() {
   const hour = new Date().getHours();
@@ -34,9 +34,11 @@ export default function HomePage() {
             flexDirection: "column",
           }}
         >
-          <h1>ホーム画面</h1>
-          <p>ここにアプリの内容を書く</p>
-          <TimeButton label="テストボタン" hour={hour} />
+          <h1 style={{ marginBottom: 8 }}>自転車クイズ</h1>//タイトル
+          <div style={{ width: 200, height: 4, background: '#222', borderRadius: 2, marginBottom: 16 }} />
+          <TimeButton label="START" hour={hour} style={{ width: 200, height: 50 }} />
+          <div style={{ height: 24 }} />
+          <TimeBox hour={hour} width={260} height={130}>最高正答率</TimeBox>
           <button
             type="button"
             onClick={() => router.push("/home")}
