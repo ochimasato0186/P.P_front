@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 
 // 時間帯によって色が変わる関数（TimeButtonと同じ仕様）
-function getButtonColor(hour: number) {
+export function getTimeBoxColor(hour: number) {
   if (hour >= 5 && hour < 10) return "#c5c5c550";      // 5:00〜10:00
   if (hour >= 10 && hour < 16) return "#FFFFFF75";     // 10:00〜16:00
   if (hour >= 16 && hour < 18) return "#40e0d050";     // 16:00〜18:00
@@ -36,7 +36,7 @@ export default function TimeBox({ children, hour, width = 260, height = 100, sty
       style={{
         width,
         height,
-        background: getButtonColor(now),
+        background: getTimeBoxColor(now),
         border: isMorning ? "2px solid #fff" : "none",
         borderRadius: 4,
         marginBottom: 40,
