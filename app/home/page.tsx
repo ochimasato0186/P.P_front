@@ -2,11 +2,23 @@
 import { useRouter } from "next/navigation";
 import TimeButton from "../../components/TimeButton";
 import Road from "../../components/Road";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 import TimeBox from "../../components/TimeBox";
+
+type Account = {
+  language?: string;
+};
+
+type LanguageItem = {
+  memo?: string;
+  language?: string;
+  text3?: string;
+  text4?: string;
+  button4?: string;
+};
 
 export default function HomePage() {
   const hour = new Date().getHours();
@@ -14,6 +26,46 @@ export default function HomePage() {
   // contextからフレームON/OFF判定（デフォルトtrue）
   const frameOn = useContext(FrameContext);
   const iconBottom = frameOn ? 30 : 66;
+  const [quizTitle, setQuizTitle] = useState("自転車クイズ");
+  const [startLabel, setStartLabel] = useState("START");
+  const [bestScoreLabel, setBestScoreLabel] = useState("最高正答率");
+
+  useEffect(() => {
+    const loadTitle = async () => {
+      try {
+        const [accountRes, languageRes] = await Promise.all([
+          fetch("/myacount.json", { cache: "no-store" }),
+          fetch("/language.json", { cache: "no-store" }),
+        ]);
+
+        if (!accountRes.ok || !languageRes.ok) return;
+
+        const accountData = await accountRes.json();
+        const languageData = await languageRes.json();
+        const accountLanguage = (Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined)?.language;
+
+        if (!accountLanguage || !Array.isArray(languageData)) return;
+
+        const matched = (languageData as LanguageItem[]).find(
+          (item) => item.memo === accountLanguage || item.language === accountLanguage
+        );
+
+        if (matched?.text3) {
+          setQuizTitle(matched.text3);
+        }
+        if (matched?.text4) {
+          setBestScoreLabel(matched.text4);
+        }
+        if (matched?.button4) {
+          setStartLabel(matched.button4);
+        }
+      } catch {
+        // 表示はデフォルト値のまま継続
+      }
+    };
+
+    loadTitle();
+  }, []);
 
   return (
     <>
@@ -34,16 +86,16 @@ export default function HomePage() {
             flexDirection: "column",
           }}
         >
-          <h1 style={{ marginBottom: 8 }}>自転車クイズ</h1>
+          <h1 style={{ marginBottom: 8 }}>{quizTitle}</h1>
           <div style={{ width: 200, height: 4, background: '#222', borderRadius: 2, marginBottom: 16 }} />
           <TimeButton
-            label="START"
+            label={startLabel}
             hour={hour}
             style={{ width: 200, height: 50 }}
             onClick={() => router.push("/quiz")}
           />
           <div style={{ height: 24 }} />
-          <TimeBox hour={hour} width={260} height={130}>最高正答率</TimeBox>
+          <TimeBox hour={hour} width={260} height={130}>{bestScoreLabel}</TimeBox>
           <button
             type="button"
             onClick={() => router.push("/home")}

@@ -14,7 +14,8 @@
     "text4":"最高正答率",
     "text5":"履歴",
     "text6":"正答率",
-    "button5":"RETRY"
+    "button5":"RETRY",
+    "button6":"保存"
   },
   {
     "memo":"日本語",
@@ -31,10 +32,11 @@
     "text4":"最高正答率",
     "text5":"履歴",
     "text6":"正答率",
-    "button5":"RETRY"
+    "button5":"RETRY",
+    "button6":"保存"
   },
   {
-    "memo":"中国語",
+  "memo":"中国語",
   "language": "中文",
   "name": "姓名",
   "password": "保存密码",
@@ -48,7 +50,8 @@
   "text4": "最高正确率",
   "text5": "历史记录",
   "text6": "正确率",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"保存"
 },
 {
   "memo":"ベトナム語",
@@ -65,7 +68,8 @@
   "text4": "Tỷ lệ đúng cao nhất",
   "text5": "Lịch sử",
   "text6": "Tỷ lệ đúng",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"Lưu"
 },
 {
     "memo":"英語",
@@ -82,7 +86,8 @@
   "text4": "Highest accuracy",
   "text5": "History",
   "text6": "Accuracy",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"Save" 
 },
 {
   "memo":"韓国語",
@@ -99,7 +104,8 @@
   "text4": "최고 정답률",
   "text5": "기록",
   "text6": "정답률",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"저장"
 },
 {
     "memo":"タガログ語",
@@ -116,7 +122,8 @@
   "text4": "Pinakamataas na accuracy",
   "text5": "Kasaysayan",
   "text6": "Accuracy",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"I-save"
 },
 {
     "memo":"タイ語",
@@ -133,7 +140,8 @@
   "text4": "อัตราความถูกต้องสูงสุด",
   "text5": "ประวัติ",
   "text6": "อัตราความถูกต้อง",
-  "button5": "RETRY"
+  "button5": "RETRY",
+  "button6":"บันทึก"
 }
 
 

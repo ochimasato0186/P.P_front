@@ -1,19 +1,66 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Road from "../../components/Road";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import TimeBox from "../../components/TimeBox";
 import TimeButton from "../../components/TimeButton";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 
+type Account = {
+  language?: string;
+};
+
+type LanguageItem = {
+  memo?: string;
+  language?: string;
+  text6?: string;
+  button5?: string;
+};
+
 export default function DatePage() {
   const frameOn = useContext(FrameContext);
   const hour = new Date().getHours();
   const router = useRouter();
+  const [accuracyLabel, setAccuracyLabel] = useState("正答率");
+  const [retryLabel, setRetryLabel] = useState("RETRY");
   // contextからフレームON/OFF判定（デフォルトtrue）
   const iconBottom = frameOn ? 30 : 66;
+
+  useEffect(() => {
+    const loadAccuracyLabel = async () => {
+      try {
+        const [accountRes, languageRes] = await Promise.all([
+          fetch("/myacount.json", { cache: "no-store" }),
+          fetch("/language.json", { cache: "no-store" }),
+        ]);
+
+        if (!accountRes.ok || !languageRes.ok) return;
+
+        const accountData = await accountRes.json();
+        const languageData = await languageRes.json();
+        const accountLanguage = (Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined)?.language;
+
+        if (!accountLanguage || !Array.isArray(languageData)) return;
+
+        const matched = (languageData as LanguageItem[]).find(
+          (item) => item.memo === accountLanguage || item.language === accountLanguage
+        );
+
+        if (matched?.text6) {
+          setAccuracyLabel(matched.text6);
+        }
+        if (matched?.button5) {
+          setRetryLabel(matched.button5);
+        }
+      } catch {
+        // 表示はデフォルト値のまま継続
+      }
+    };
+
+    loadAccuracyLabel();
+  }, []);
 
   return (
     <>
@@ -45,9 +92,9 @@ export default function DatePage() {
               </tbody>
             </table>
           </div>
-          <TimeBox hour={hour} width={300} height={100} style={{ marginBottom: 4 }}>正答率</TimeBox>
+          <TimeBox hour={hour} width={300} height={100} style={{ marginBottom: 4 }}>{accuracyLabel}</TimeBox>
           <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: 0 }}>
-            <TimeButton label="RETRY" hour={hour} onClick={() => router.push("/quiz")} />
+            <TimeButton label={retryLabel} hour={hour} onClick={() => router.push("/quiz")} />
           </div>
           <button
             type="button"
