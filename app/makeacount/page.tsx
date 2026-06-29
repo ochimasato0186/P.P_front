@@ -1,4 +1,12 @@
 "use client";
+
+/**
+ * 新規アカウント作成画面（フロントエンド）
+ * 
+ * ユーザーが入力した名前、メール、パスワード、言語選択を取得し、
+ * バックエンド（Laravel）の登録APIへリクエストを送信してユーザー登録を行います。
+ */
+
 import { useRouter } from "next/navigation";
 import TimeButton from "../../components/TimeButton";
 import TimeBox, { getTimeBoxColor } from "../../components/TimeBox";
@@ -22,7 +30,9 @@ export default function QuizPage() {
   const frameOn = useContext(FrameContext);
   const router = useRouter();
   const iconBottom = frameOn ? 30 : 66;
-  const [text, setText] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [namePlaceholder, setNamePlaceholder] = useState("名前");
   const [emailPlaceholder, setEmailPlaceholder] = useState("メールアドレス");
   const [passwordPlaceholder, setPasswordPlaceholder] = useState("パスワード");
@@ -98,6 +108,48 @@ export default function QuizPage() {
       setStatus("");
     }
   };
+
+  const handleRegister = async () => {
+    if (!name || !email || !password || !selectedLanguage) {
+      setStatus("全ての項目を入力・選択してください。");
+      return;
+    }
+
+    try {
+      setStatus("登録処理中...");
+      const res = await fetch("http://localhost:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          language: selectedLanguage,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.errors) {
+          const firstErrorKey = Object.keys(data.errors)[0];
+          const errorMessage = data.errors[firstErrorKey][0];
+          setStatus(errorMessage);
+        } else {
+          setStatus(data.message || "登録に失敗しました。");
+        }
+        return;
+      }
+
+      setStatus("登録に成功しました！");
+      localStorage.setItem("access_token", data.access_token);
+    } catch {
+      setStatus("サーバーとの通信に失敗しました。");
+    }
+  };
   return (
     <>
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -112,10 +164,11 @@ export default function QuizPage() {
             padding: 0,
           }}
         >
+          {/* 名前 */}
           <input
             type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder={namePlaceholder}
             style={{
               width: 260,
@@ -131,6 +184,7 @@ export default function QuizPage() {
               marginBottom: 24,
             }}
           />
+          {/* 言語選択 */}
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -162,10 +216,11 @@ export default function QuizPage() {
             ))}
           </select>
           {status && <p>{status}</p>}
+          {/* メールアドレス入力 */}
           <input
             type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder={emailPlaceholder}
             style={{
               width: 260,
@@ -181,10 +236,11 @@ export default function QuizPage() {
               marginBottom: 24,
             }}
           />
-            <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+          {/*パスワード入力 */}
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder={passwordPlaceholder}
             style={{
               width: 260,
@@ -204,16 +260,16 @@ export default function QuizPage() {
             label={registerLabel}
             hour={hour}
             style={{ width: 200, height: 50, marginBottom: 8 }}
-            onClick={() => {}}
+            onClick={handleRegister}
           />
           <TimeButton
             label={loginLabel}
             hour={hour}
             style={{ width: 200, height: 50, marginTop: 0, marginBottom: 24 }}
-            onClick={() => {}}
+            onClick={() => { }}
           />
 
-          
+
           <button
             type="button"
             onClick={() => router.push("")}
