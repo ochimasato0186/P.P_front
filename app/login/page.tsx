@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -45,7 +44,6 @@ export default function QuizPage() {
               gap: "18px",
             }}
           >
-
             <input
               type="email"
               placeholder="メールアドレス"
@@ -74,31 +72,75 @@ export default function QuizPage() {
                 border: "1px solid #ddd",
                 fontSize: "18px",
                 boxSizing: "border-box",
+                color: "#000000",
               }}
             />
 
             <button
-  onClick={() => {
-    console.log(email);
-    console.log(password);
-  }}
-  style={{
-    width: "85%",
-    height: "60px",
-    borderRadius: "999px",
-    border: "none",
-    backgroundColor: "#ffffff",
-    color: "#000000",
-    fontSize: "22px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    marginTop: "20px",
-  }}
->
-  ログイン
-</button>
+              onClick={async () => {
+                try {
+                  const response = await fetch(
+                    "http://127.0.0.1:8000/api/login",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                      },
+                      body: JSON.stringify({
+                        email,
+                        password,
+                      }),
+                    }
+                  );
 
-<button
+                  const data = await response.json();
+
+                  console.log("Status:", response.status);
+                  console.log("Data:", data);
+
+                  if (response.ok) {
+                    // トークン保存
+                    localStorage.setItem(
+                      "access_token",
+                      data.access_token
+                    );
+
+                    // ユーザー情報保存
+                    localStorage.setItem(
+                      "user",
+                      JSON.stringify(data.user)
+                    );
+
+                    alert("ログイン成功！");
+
+                    // ホーム画面へ
+                    router.push("/home");
+                  } else {
+                    alert(data.message ?? "ログインに失敗しました。");
+                  }
+                } catch (error) {
+                  console.error(error);
+                  alert("サーバーに接続できませんでした。");
+                }
+              }}
+              style={{
+                width: "85%",
+                height: "60px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                fontSize: "22px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginTop: "20px",
+              }}
+            >
+              ログイン
+            </button>
+
+            <button
               onClick={() => router.push("/register")}
               style={{
                 width: "85%",
@@ -112,13 +154,11 @@ export default function QuizPage() {
                 cursor: "pointer",
                 marginTop: "10px",
               }}
-              >
+            >
               新規登録
             </button>
-
           </div>
 
-          {/* ホームボタン */}
           <button
             type="button"
             onClick={() => router.push("")}
@@ -137,7 +177,6 @@ export default function QuizPage() {
             <IoHomeOutline size={50} />
           </button>
 
-          {/* 自転車ボタン */}
           <button
             type="button"
             onClick={() => router.push("")}

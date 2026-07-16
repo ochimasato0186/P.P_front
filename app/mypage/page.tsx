@@ -31,59 +31,54 @@ export default function MyPage() {
   const [saveStatus, setSaveStatus] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [accountRes, languageRes] = await Promise.all([
-          fetch("/myacount.json", { cache: "no-store" }),
-          fetch("/language.json", { cache: "no-store" }),
-        ]);
+  // ログインしたユーザーを取得
+  const savedUser = localStorage.getItem("user");
 
-        if (!accountRes.ok || !languageRes.ok) {
-          setStatus("データの取得に失敗しました");
-          return;
-        }
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
 
-        const accountData = await accountRes.json();
-        const languageData = await languageRes.json();
+    setAccount({
+      name: user.name,
+      email: user.email,
+      language: user.language,
+    });
 
-        const firstAccount = Array.isArray(accountData) ? accountData[0] : null;
-        if (!firstAccount) {
-          setAccount(null);
-          setStatus("データが空です");
-          return;
-        }
+    setSelectedLanguage(user.language);
+    setStatus("");
+  } else {
+    setStatus("ログインしてください");
+  }
 
-        const languageOptions = Array.isArray(languageData)
-          ? Array.from(
-              new Set(
-                (languageData as LanguageItem[])
-                  .map((item) => item?.language)
-                  .filter((value): value is string => typeof value === "string" && value.length > 0)
-              )
+  // language.jsonは今まで通り読み込む
+  const loadLanguages = async () => {
+    try {
+      const res = await fetch("/language.json", {
+        cache: "no-store",
+      });
+
+      if (!res.ok) return;
+
+      const data: LanguageItem[] = await res.json();
+
+      const languageOptions: string[] = Array.from(
+        new Set(
+          data
+            .map((item: LanguageItem) => item.language)
+            .filter(
+              (value): value is string =>
+                typeof value === "string" && value.length > 0
             )
-          : [];
+        )
+      );
 
-        setLanguages(languageOptions);
+      setLanguages(languageOptions);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-        setAccount({
-          name: firstAccount.name ?? "",
-          email: firstAccount.email ?? "",
-          language: firstAccount.language ?? "",
-        });
-
-        const initialLanguage = firstAccount.language ?? "";
-        setSelectedLanguage(initialLanguage || languageOptions[0] || "");
-        setStatus("");
-      } catch {
-        setAccount(null);
-        setLanguages([]);
-        setSelectedLanguage("");
-        setStatus("データの取得に失敗しました");
-      }
-    };
-
-    loadData();
-  }, []);
+  loadLanguages();
+}, []);
 
   const handleSaveLanguage = async () => {
     if (!selectedLanguage) {
