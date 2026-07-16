@@ -41,7 +41,6 @@ export default function QuizPage() {
   const [languages, setLanguages] = useState<string[]>([]);
   const [languageItems, setLanguageItems] = useState<LanguageItem[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [status, setStatus] = useState("");
   const isMorning = hour >= 5 && hour < 10;
 
   useEffect(() => {
@@ -85,7 +84,7 @@ export default function QuizPage() {
 
   const handleUpdateLanguage = async () => {
     if (!selectedLanguage) {
-      setStatus("Language");
+      window.alert("言語を選択してください。");
       return;
     }
 
@@ -99,24 +98,21 @@ export default function QuizPage() {
       });
 
       if (!res.ok) {
-        setStatus("");
+        window.alert("言語の更新に失敗しました。");
         return;
       }
-
-      setStatus("");
     } catch {
-      setStatus("");
+      window.alert("通信に失敗しました。" );
     }
   };
 
   const handleRegister = async () => {
     if (!name || !email || !password || !selectedLanguage) {
-      setStatus("全ての項目を入力・選択してください。");
+      window.alert("全ての項目を入力・選択してください。");
       return;
     }
 
     try {
-      setStatus("登録処理中...");
       const res = await fetch("http://localhost:8000/api/register", {
         method: "POST",
         headers: {
@@ -137,17 +133,17 @@ export default function QuizPage() {
         if (data.errors) {
           const firstErrorKey = Object.keys(data.errors)[0];
           const errorMessage = data.errors[firstErrorKey][0];
-          setStatus(errorMessage);
+          window.alert(errorMessage);
         } else {
-          setStatus(data.message || "登録に失敗しました。");
+          window.alert(data.message || "登録に失敗しました。");
         }
         return;
       }
 
-      setStatus("登録に成功しました！");
       localStorage.setItem("access_token", data.access_token);
+      window.alert("登録に成功しました！");
     } catch {
-      setStatus("サーバーとの通信に失敗しました。");
+      window.alert("サーバーとの通信に失敗しました。");
     }
   };
   return (
@@ -158,121 +154,139 @@ export default function QuizPage() {
             width: "100%",
             height: "100%",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
             justifyContent: "center",
+            alignItems: "center",
             padding: 0,
           }}
         >
-          {/* 名前 */}
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={namePlaceholder}
+          <div
             style={{
-              width: 260,
-              height: 44,
-              background: getTimeBoxColor(hour),
-              border: isMorning ? "2px solid #fff" : "none",
-              borderRadius: 4,
-              padding: "0 12px",
-              color: "#222",
-              fontSize: 16,
-              outline: "none",
-              boxShadow: "none",
-              marginBottom: 24,
-            }}
-          />
-          {/* 言語選択 */}
-          <select
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-            aria-label="言語選択"
-            style={{
-              width: 285,
-              height: 45,
-              background: getTimeBoxColor(hour),
-              border: isMorning ? "2px solid #fff" : "none",
-              borderRadius: 6,
-              padding: "0 10px",
-              color: "#222",
-              fontSize: 14,
-              outline: "none",
-              appearance: "none",
-              WebkitAppearance: "none",
-              MozAppearance: "none",
-              boxShadow: "none",
-              marginBottom: 16,
+              width: "85%",
+              maxWidth: "320px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "18px",
             }}
           >
-            <option value="" disabled>
-              Language
-            </option>
-            {languages.map((language) => (
-              <option key={language} value={language}>
-                {language}
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={namePlaceholder}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+                color: "#000000",
+                outline: "none",
+                backgroundColor: "#ffffff",
+              }}
+            />
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              aria-label="言語選択"
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+                color: "#000000",
+                outline: "none",
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                backgroundColor: "#ffffff",
+              }}
+            >
+              <option value="" disabled>
+                Language
               </option>
-            ))}
-          </select>
-          {status && <p>{status}</p>}
-          {/* メールアドレス入力 */}
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={emailPlaceholder}
-            style={{
-              width: 260,
-              height: 44,
-              background: getTimeBoxColor(hour),
-              border: isMorning ? "2px solid #fff" : "none",
-              borderRadius: 4,
-              padding: "0 12px",
-              color: "#222",
-              fontSize: 16,
-              outline: "none",
-              boxShadow: "none",
-              marginBottom: 24,
-            }}
-          />
-          {/*パスワード入力 */}
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={passwordPlaceholder}
-            style={{
-              width: 260,
-              height: 44,
-              background: getTimeBoxColor(hour),
-              border: isMorning ? "2px solid #fff" : "none",
-              borderRadius: 4,
-              padding: "0 12px",
-              color: "#fff",
-              fontSize: 16,
-              outline: "none",
-              boxShadow: "none",
-              marginBottom: 24,
-            }}
-          />
-          <TimeButton
-            label={registerLabel}
-            hour={hour}
-            style={{ width: 200, height: 50, marginBottom: 8 }}
-            onClick={handleRegister}
-          />
-          <TimeButton
-            label={loginLabel}
-            hour={hour}
-            style={{ width: 200, height: 50, marginTop: 0, marginBottom: 24 }}
-            onClick={() => { }}
-          />
-
+              {languages.map((language) => (
+                <option key={language} value={language}>
+                  {language}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={emailPlaceholder}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+                color: "#000000",
+                outline: "none",
+                backgroundColor: "#ffffff",
+              }}
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={passwordPlaceholder}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+                color: "#000000",
+                outline: "none",
+                backgroundColor: "#ffffff",
+              }}
+            />
+            <TimeButton
+              label={registerLabel}
+              hour={hour}
+              style={{
+                width: "85%",
+                height: "60px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                fontSize: "22px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginTop: "20px",
+              }}
+              onClick={handleRegister}
+            />
+            <TimeButton
+              label={loginLabel}
+              hour={hour}
+              style={{
+                width: "85%",
+                height: "60px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                fontSize: "22px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginTop: "10px",
+              }}
+              onClick={() => router.push("/login")}
+            />
+          </div>
 
           <button
             type="button"
-            onClick={() => router.push("")}
+            onClick={() => router.push("/home")}
             aria-label="ホーム画面へ移動"
             style={{ position: "absolute", right: 16, bottom: iconBottom, background: "transparent", border: "none", padding: 0, cursor: "pointer", zIndex: 101 }}
           >
@@ -280,7 +294,7 @@ export default function QuizPage() {
           </button>
           <button
             type="button"
-            onClick={() => router.push("")}
+            onClick={() => router.push("/mypage")}
             aria-label="マイページへ移動"
             style={{ position: "absolute", left: 16, bottom: iconBottom, background: "transparent", border: "none", padding: 0, cursor: "pointer", zIndex: 101 }}
           >
