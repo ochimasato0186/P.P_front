@@ -45,16 +45,6 @@ export default function QuizPage() {
               gap: "18px",
             }}
           >
-            <h1
-              style={{
-                fontSize: "40px",
-                fontWeight: "bold",
-                marginBottom: "25px",
-                color: "#ffffff",
-              }}
-            >
-              ログイン
-            </h1>
 
             <input
               type="email"
@@ -68,7 +58,7 @@ export default function QuizPage() {
                 border: "1px solid #ddd",
                 fontSize: "18px",
                 boxSizing: "border-box",
-                color: "#ffffff",
+                color: "#000000",
               }}
             />
 
@@ -88,23 +78,44 @@ export default function QuizPage() {
             />
 
             <button
-              onClick={() => {
-                console.log(email);
-                console.log(password);
-              }}
+  onClick={() => {
+    console.log(email);
+    console.log(password);
+  }}
+  style={{
+    width: "85%",
+    height: "60px",
+    borderRadius: "999px",
+    border: "none",
+    backgroundColor: "#ffffff",
+    color: "#000000",
+    fontSize: "22px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    marginTop: "20px",
+  }}
+>
+  ログイン
+</button>
+
+<button
+              onClick={() => router.push("/register")}
               style={{
-                width: "100%",
-                padding: "15px",
-                borderRadius: "12px",
+                width: "85%",
+                height: "60px",
+                borderRadius: "999px",
                 border: "none",
-                backgroundColor: "#1976f2",
-                color: "#fff",
+                backgroundColor: "#ffffff",
+                color: "#000000",
                 fontSize: "22px",
+                fontWeight: "bold",
                 cursor: "pointer",
+                marginTop: "10px",
               }}
-            >
-              ログイン
+              >
+              新規登録
             </button>
+
           </div>
 
           {/* ホームボタン */}
