@@ -1,51 +1,154 @@
+
 "use client";
+
 import { useRouter } from "next/navigation";
-import TimeButton from "../../components/TimeButton";
-import TimeBox from "../../components/TimeBox";
-import Road from "../../components/Road";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
+import Road from "../../components/Road";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 
 export default function QuizPage() {
-  const hour = new Date().getHours();
   const frameOn = useContext(FrameContext);
   const router = useRouter();
+
   const iconBottom = frameOn ? 30 : 66;
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <>
-      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100%",
+        }}
+      >
         <main
           style={{
             width: "100%",
             height: "100%",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
             justifyContent: "center",
-            padding: 0,
+            alignItems: "center",
           }}
         >
+          <div
+            style={{
+              width: "85%",
+              maxWidth: "320px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "18px",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: "40px",
+                fontWeight: "bold",
+                marginBottom: "25px",
+                color: "#ffffff",
+              }}
+            >
+              ログイン
+            </h1>
+
+            <input
+              type="email"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+                color: "#ffffff",
+              }}
+            />
+
+            <input
+              type="password"
+              placeholder="パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "18px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                console.log(email);
+                console.log(password);
+              }}
+              style={{
+                width: "100%",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "none",
+                backgroundColor: "#1976f2",
+                color: "#fff",
+                fontSize: "22px",
+                cursor: "pointer",
+              }}
+            >
+              ログイン
+            </button>
+          </div>
+
+          {/* ホームボタン */}
           <button
             type="button"
             onClick={() => router.push("")}
             aria-label="ホーム画面へ移動"
-            style={{ position: "absolute", right: 16, bottom: iconBottom, background: "transparent", border: "none", padding: 0, cursor: "pointer", zIndex: 101 }}
+            style={{
+              position: "absolute",
+              right: 16,
+              bottom: iconBottom,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              zIndex: 101,
+            }}
           >
             <IoHomeOutline size={50} />
           </button>
+
+          {/* 自転車ボタン */}
           <button
             type="button"
             onClick={() => router.push("")}
             aria-label="マイページへ移動"
-            style={{ position: "absolute", left: 16, bottom: iconBottom, background: "transparent", border: "none", padding: 0, cursor: "pointer", zIndex: 101 }}
+            style={{
+              position: "absolute",
+              left: 16,
+              bottom: iconBottom,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              zIndex: 101,
+            }}
           >
             <MdOutlineDirectionsBike size={50} />
           </button>
         </main>
+
         {frameOn && <Road insideFrame={true} />}
       </div>
+
       {!frameOn && <Road insideFrame={false} />}
     </>
   );
