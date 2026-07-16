@@ -141,7 +141,7 @@ export default function QuizPage() {
             </button>
 
             <button
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/makeacount")}
               style={{
                 width: "85%",
                 height: "60px",
@@ -161,7 +161,7 @@ export default function QuizPage() {
 
           <button
             type="button"
-            onClick={() => router.push("")}
+            onClick={() => router.push("/home")}
             aria-label="ホーム画面へ移動"
             style={{
               position: "absolute",
@@ -179,7 +179,7 @@ export default function QuizPage() {
 
           <button
             type="button"
-            onClick={() => router.push("")}
+            onClick={() => router.push("/mypage")}
             aria-label="マイページへ移動"
             style={{
               position: "absolute",
