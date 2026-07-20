@@ -3,6 +3,10 @@
     "name": "山田　次郎",
     "email": "yamada@example.com",
     "password": "password123",
+<<<<<<< HEAD
     "language": "日本語
+=======
+    "language": "English"
+>>>>>>> parent of 39f76d8 (CSV保存)
   }
 ]
