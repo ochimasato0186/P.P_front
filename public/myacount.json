@@ -3,6 +3,10 @@
     "name": "山田　次郎",
     "email": "yamada@example.com",
     "password": "password123",
+<<<<<<< HEAD
     "language": "中文"
+=======
+    "language": "日本語
+>>>>>>> masato_task
   }
 ]
