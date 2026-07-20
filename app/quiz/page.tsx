@@ -3,16 +3,161 @@ import { useRouter } from "next/navigation";
 import TimeButton from "../../components/TimeButton";
 import TimeBox from "../../components/TimeBox";
 import Road from "../../components/Road";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
+
+type TrueFalseQuestion = {
+  type: "trueFalse";
+  questionNumber: string;
+  text: string;
+  difficulty: string;
+  category: string;
+  answer: string;
+  explanation: string;
+  reference: string;
+};
+
+type MultipleChoiceQuestion = {
+  type: "multipleChoice";
+  category: string;
+  difficulty: string;
+  text: string;
+  options: [string, string, string, string];
+  correctAnswer: number;
+  explanation: string;
+  reference: string;
+};
+
+type Question = TrueFalseQuestion | MultipleChoiceQuestion;
 
 export default function QuizPage() {
   const hour = new Date().getHours();
   const frameOn = useContext(FrameContext);
   const router = useRouter();
   const iconBottom = frameOn ? 30 : 66;
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [answers, setAnswers] = useState<(string | number)[]>([]);
+
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        let language = "日本語"; // デフォルト言語
+        
+        // localStorage から言語を取得
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            language = user?.language || "日本語";
+          } catch (e) {
+            console.error("Failed to parse user data:", e);
+          }
+        }
+
+        const response = await fetch(`/api/quiz/load?language=${encodeURIComponent(language)}`);
+        if (!response.ok) {
+          setError("問題の読み込みに失敗しました");
+          setLoading(false);
+          return;
+        }
+
+        const data = await response.json();
+        setQuestions(data.questions || []);
+        setAnswers(new Array(data.questions?.length || 0).fill(null));
+        setLoading(false);
+      } catch (err) {
+        setError("エラーが発生しました");
+        setLoading(false);
+      }
+    };
+
+    loadQuestions();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <main
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
+          }}
+        >
+          <TimeBox hour={hour} width={260} height={100}>
+            問題を読み込み中...
+          </TimeBox>
+        </main>
+        {frameOn && <Road insideFrame={true} />}
+      </div>
+    );
+  }
+
+  if (error || questions.length === 0) {
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <main
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
+          }}
+        >
+          <TimeBox hour={hour} width={260} height={100}>
+            {error || "問題が見つかりません"}
+          </TimeBox>
+          <button
+            onClick={() => router.push("/home")}
+            style={{
+              marginTop: 20,
+              padding: "10px 20px",
+              background: "#007AFF",
+              color: "white",
+              border: "none",
+              borderRadius: 8,
+              cursor: "pointer",
+            }}
+          >
+            ホームに戻る
+          </button>
+        </main>
+        {frameOn && <Road insideFrame={true} />}
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentIndex];
+  const isTrueFalse = currentQuestion.type === "trueFalse";
+  const isMultipleChoice = currentQuestion.type === "multipleChoice";
+  const isLastQuestion = currentIndex === questions.length - 1;
+
+  const handleAnswer = (value: string | number) => {
+    const newAnswers = [...answers];
+    newAnswers[currentIndex] = value;
+    setAnswers(newAnswers);
+
+    if (isLastQuestion) {
+      // クイズ完了
+      router.push("/home");
+    } else {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
   return (
     <>
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -27,20 +172,101 @@ export default function QuizPage() {
             padding: 0,
           }}
         >
-          <TimeBox hour={hour} width={260} height={100}>問題文</TimeBox>
-          {/* ボタン2つを横並び中央配置 */}
+          {/* 問題数インジケーター */}
+          <div
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              fontSize: 14,
+              color: "#666",
+            }}
+          >
+            問題 {currentIndex + 1}/{questions.length}
+          </div>
+
+          {/* 問題文 */}
+          <TimeBox hour={hour} width={260} height={isTrueFalse ? 100 : 140}>
+            <div style={{ fontSize: 14, overflow: "auto", padding: 8 }}>
+              {currentQuestion.text}
+            </div>
+          </TimeBox>
+
+          {/* 回答ボタン */}
           <div
             style={{
               display: "flex",
-              flexDirection: "row",
+              flexDirection: isTrueFalse ? "row" : "column",
               gap: 24,
               justifyContent: "center",
               alignItems: "center",
+              marginTop: 20,
+              width: "100%",
+              flexWrap: "wrap",
             }}
           >
-            <TimeButton label="A" hour={hour} value={1} style={{ minWidth: 120 }} onClick={(val) => alert(`Aの値: ${val}`)} />
-            <TimeButton label="B" hour={hour} value={2} style={{ minWidth: 120 }} onClick={(val) => alert(`Bの値: ${val}`)} />
+            {isTrueFalse ? (
+              <>
+                <button
+                  onClick={() => handleAnswer("〇")}
+                  style={{
+                    background: `rgba(175, 238, 238, 0.5)`,
+                    color: "#fff",
+                    borderRadius: 24,
+                    padding: "12px 24px",
+                    fontSize: 16,
+                    border: "2px solid #fff",
+                    cursor: "pointer",
+                    minWidth: 120,
+                    transition: "all 0.2s",
+                    fontWeight: "bold",
+                  }}
+                >
+                  〇
+                </button>
+                <button
+                  onClick={() => handleAnswer("✕")}
+                  style={{
+                    background: `rgba(175, 238, 238, 0.5)`,
+                    color: "#fff",
+                    borderRadius: 24,
+                    padding: "12px 24px",
+                    fontSize: 16,
+                    border: "2px solid #fff",
+                    cursor: "pointer",
+                    minWidth: 120,
+                    transition: "all 0.2s",
+                    fontWeight: "bold",
+                  }}
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              (currentQuestion as MultipleChoiceQuestion).options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAnswer(index + 1)}
+                  style={{
+                    background: `rgba(175, 238, 238, 0.5)`,
+                    color: "#fff",
+                    borderRadius: 24,
+                    padding: "12px 24px",
+                    fontSize: 16,
+                    border: "2px solid #fff",
+                    cursor: "pointer",
+                    minWidth: 120,
+                    transition: "all 0.2s",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))
+            )}
           </div>
+
+          {/* ナビゲーション */}
           <button
             type="button"
             onClick={() => router.push("/home")}
