@@ -144,8 +144,13 @@ export default function QuizPage() {
         return;
       }
 
+      sessionStorage.setItem(
+        "signup_prefill",
+        JSON.stringify({ email, password })
+      );
       setStatus("登録に成功しました！");
       localStorage.setItem("access_token", data.access_token);
+      router.push("/login");
     } catch {
       setStatus("サーバーとの通信に失敗しました。");
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import Road from "../../components/Road";
 import { IoHomeOutline } from "react-icons/io5";
@@ -20,6 +20,24 @@ export default function QuizPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem("signup_prefill");
+      if (!stored) return;
+
+      const data = JSON.parse(stored) as { email?: string; password?: string };
+      if (data.email) {
+        setEmail(data.email);
+      }
+      if (data.password) {
+        setPassword(data.password);
+      }
+      sessionStorage.removeItem("signup_prefill");
+    } catch {
+      sessionStorage.removeItem("signup_prefill");
+    }
+  }, []);
 
   const handleLogin = async () => {
     try {
@@ -40,6 +58,7 @@ export default function QuizPage() {
       if (response.ok) {
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        sessionStorage.removeItem("signup_prefill");
         alert("ログイン成功！");
         router.push("/home");
       } else {
