@@ -43,6 +43,7 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [answers, setAnswers] = useState<(string | number)[]>([]);
+  const [correctCount, setCorrectCount] = useState(0);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -145,13 +146,32 @@ export default function QuizPage() {
   const isMultipleChoice = currentQuestion.type === "multipleChoice";
   const isLastQuestion = currentIndex === questions.length - 1;
 
-  const handleAnswer = (value: string | number) => {
+  const handleAnswer = async (value: string | number) => {
     const newAnswers = [...answers];
     newAnswers[currentIndex] = value;
     setAnswers(newAnswers);
 
+    const isCorrect =
+      currentQuestion.type === "trueFalse"
+        ? value === currentQuestion.answer
+        : value === currentQuestion.correctAnswer;
+    const nextCorrectCount = isCorrect ? correctCount + 1 : correctCount;
+    setCorrectCount(nextCorrectCount);
+
     if (isLastQuestion) {
       // クイズ完了
+      const accuracy = Math.round((nextCorrectCount / questions.length) * 100);
+      try {
+        await fetch("/api/myacount/date", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ date: String(accuracy) }),
+        });
+      } catch {
+        // 保存に失敗しても結果画面への遷移は継続
+      }
       router.push("/date");
     } else {
       setCurrentIndex(currentIndex + 1);

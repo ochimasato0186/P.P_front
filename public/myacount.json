@@ -3,14 +3,7 @@
     "name": "山田　次郎",
     "email": "yamada@example.com",
     "password": "password123",
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "language": "中文"
-=======
-    "language": "日本語
->>>>>>> masato_task
-=======
-    "language": "日本語"
->>>>>>> b245460faf82a9fbba7cf4485e13871911eedd23
+    "language": "日本語",
+    "date": "50"
   }
 ]

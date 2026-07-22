@@ -10,6 +10,7 @@ import { MdOutlineDirectionsBike } from "react-icons/md";
 
 type Account = {
   language?: string;
+  date?: string;
 };
 
 type LanguageItem = {
@@ -24,6 +25,7 @@ export default function DatePage() {
   const hour = new Date().getHours();
   const router = useRouter();
   const [accuracyLabel, setAccuracyLabel] = useState("正答率");
+  const [accuracyValue, setAccuracyValue] = useState("0%");
   const [retryLabel, setRetryLabel] = useState("RETRY");
   // contextからフレームON/OFF判定（デフォルトtrue）
   const iconBottom = frameOn ? 30 : 66;
@@ -40,7 +42,14 @@ export default function DatePage() {
 
         const accountData = await accountRes.json();
         const languageData = await languageRes.json();
-        const accountLanguage = (Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined)?.language;
+        const account = Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined;
+        const accountLanguage = account?.language;
+        const rawDate = account?.date;
+
+        if (typeof rawDate === "string" && rawDate.trim()) {
+          const normalized = rawDate.trim().replace(/%$/, "");
+          setAccuracyValue(`${normalized}%`);
+        }
 
         if (!accountLanguage || !Array.isArray(languageData)) return;
 
@@ -77,7 +86,12 @@ export default function DatePage() {
           }}
         >
           <div style={{ width: "min(300px, 100%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <TimeBox hour={hour} width="100%" height={100} style={{ marginBottom: 16 }}>{accuracyLabel}</TimeBox>
+            <TimeBox hour={hour} width="100%" height={100} style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div>{accuracyLabel}</div>
+                <div style={{ fontSize: 24, fontWeight: "bold" }}>{accuracyValue}</div>
+              </div>
+            </TimeBox>
             <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
               <TimeButton label={retryLabel} hour={hour} onClick={() => router.push("/quiz")} />
             </div>
