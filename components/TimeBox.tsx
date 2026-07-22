@@ -36,6 +36,7 @@ export default function TimeBox({ children, hour, width = 260, height = 100, sty
       style={{
         width,
         height,
+        boxSizing: "border-box",
         background: getTimeBoxColor(now),
         border: isMorning ? "2px solid #fff" : "none",
         borderRadius: 4,

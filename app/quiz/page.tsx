@@ -152,7 +152,7 @@ export default function QuizPage() {
 
     if (isLastQuestion) {
       // クイズ完了
-      router.push("/home");
+      router.push("/date");
     } else {
       setCurrentIndex(currentIndex + 1);
     }
@@ -186,22 +186,40 @@ export default function QuizPage() {
           </div>
 
           {/* 問題文 */}
-          <TimeBox hour={hour} width={260} height={isTrueFalse ? 100 : 140}>
-            <div style={{ fontSize: 14, overflow: "auto", padding: 8 }}>
-              {currentQuestion.text}
+          <TimeBox hour={hour} width={260} height={isTrueFalse ? 100 : 180}>
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                fontSize: 14,
+                lineHeight: 1.6,
+                overflowY: "auto",
+                paddingRight: 4,
+              }}
+            >
+              <div>{currentQuestion.text}</div>
+              {isMultipleChoice && (
+                <div style={{ marginTop: 8 }}>
+                  {(currentQuestion as MultipleChoiceQuestion).options.map((option, index) => (
+                    <div key={`option-text-${index}`}>
+                      {index + 1}，{option}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </TimeBox>
 
           {/* 回答ボタン */}
           <div
             style={{
-              display: "flex",
-              flexDirection: isTrueFalse ? "row" : "column",
+              display: isTrueFalse ? "flex" : "grid",
+              gridTemplateColumns: isTrueFalse ? undefined : "repeat(2, minmax(120px, 1fr))",
               gap: 24,
               justifyContent: "center",
               alignItems: "center",
               marginTop: 20,
-              width: "100%",
+              width: isTrueFalse ? "100%" : 260,
               flexWrap: "wrap",
             }}
           >
