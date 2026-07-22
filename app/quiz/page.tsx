@@ -7,6 +7,8 @@ import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
 
 type TrueFalseQuestion = {
   type: "trueFalse";
@@ -162,13 +164,15 @@ export default function QuizPage() {
       // クイズ完了
       const accuracy = Math.round((nextCorrectCount / questions.length) * 100);
       try {
-        await fetch("/api/myacount/date", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ date: String(accuracy) }),
-        });
+        const uid = auth.currentUser?.uid;
+        if (uid) {
+          await updateDoc(doc(db, "user", uid), { date: String(accuracy) });
+          const stored = localStorage.getItem("user");
+          if (stored) {
+            const user = JSON.parse(stored);
+            localStorage.setItem("user", JSON.stringify({ ...user, date: String(accuracy) }));
+          }
+        }
       } catch {
         // 保存に失敗しても結果画面への遷移は継続
       }

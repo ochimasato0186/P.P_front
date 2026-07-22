@@ -8,6 +8,9 @@ import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 import TimeButton from "../../components/TimeButton";
 import TimeBox, { getTimeBoxColor } from "../../components/TimeBox";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
 
 export default function QuizPage() {
   const frameOn = useContext(FrameContext);
@@ -41,32 +44,26 @@ export default function QuizPage() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = credential.user.uid;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        sessionStorage.removeItem("signup_prefill");
-        alert("ログイン成功！");
-        router.push("/home");
-      } else {
-        alert(data.message ?? "ログインに失敗しました。");
+      const snap = await getDoc(doc(db, "user", uid));
+      if (!snap.exists()) {
+        alert("ユーザー情報が見つかりません。");
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      alert("サーバーに接続できませんでした。");
+
+      const userData = snap.data();
+      localStorage.setItem("user", JSON.stringify(userData));
+      sessionStorage.removeItem("signup_prefill");
+      router.push("/home");
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code;
+      if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") {
+        alert("メールアドレスまたはパスワードが間違っています。");
+      } else {
+        alert("ログインに失敗しました。");
+      }
     }
   };
 

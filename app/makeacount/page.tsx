@@ -1,12 +1,5 @@
 "use client";
 
-/**
- * 新規アカウント作成画面（フロントエンド）
- * 
- * ユーザーが入力した名前、メール、パスワード、言語選択を取得し、
- * バックエンド（Laravel）の登録APIへリクエストを送信してユーザー登録を行います。
- */
-
 import { useRouter } from "next/navigation";
 import TimeButton from "../../components/TimeButton";
 import TimeBox, { getTimeBoxColor } from "../../components/TimeBox";
@@ -15,6 +8,9 @@ import { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../../components/PhoneFrame";
 import { IoHomeOutline, IoRefreshOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
 
 type LanguageItem = {
   language?: string;
@@ -117,42 +113,40 @@ export default function QuizPage() {
 
     try {
       setStatus("登録処理中...");
-      const res = await fetch("http://localhost:8000/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          language: selectedLanguage,
-        }),
-      });
 
-      const data = await res.json();
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = credential.user.uid;
 
-      if (!res.ok) {
-        if (data.errors) {
-          const firstErrorKey = Object.keys(data.errors)[0];
-          const errorMessage = data.errors[firstErrorKey][0];
-          setStatus(errorMessage);
-        } else {
-          setStatus(data.message || "登録に失敗しました。");
-        }
+      const userData = {
+        name,
+        email,
+        language: selectedLanguage,
+        date: "0",
+      };
+
+      try {
+        await setDoc(doc(db, "user", uid), userData);
+      } catch {
+        // Firestoreへの書き込みに失敗した場合はAuthユーザーも削除してロールバック
+        await credential.user.delete();
+        setStatus("登録に失敗しました。Firestoreのルール設定を確認してください。");
         return;
       }
 
-      sessionStorage.setItem(
-        "signup_prefill",
-        JSON.stringify({ email, password })
-      );
+      sessionStorage.setItem("signup_prefill", JSON.stringify({ email, password }));
       setStatus("登録に成功しました！");
-      localStorage.setItem("access_token", data.access_token);
       router.push("/login");
-    } catch {
-      setStatus("サーバーとの通信に失敗しました。");
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code;
+      if (code === "auth/email-already-in-use") {
+        setStatus("このメールアドレスは既に使用されています。");
+      } else if (code === "auth/weak-password") {
+        setStatus("パスワードは6文字以上で入力してください。");
+      } else if (code === "auth/invalid-email") {
+        setStatus("正しいメールアドレスを入力してください。");
+      } else {
+        setStatus("登録に失敗しました。");
+      }
     }
   };
   return (

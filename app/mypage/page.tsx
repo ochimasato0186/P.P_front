@@ -7,6 +7,8 @@ import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 import TimeBox, { getTimeBoxColor } from "../../components/TimeBox";
 import TimeButton from "../../components/TimeButton";
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
 
 type Account = {
   name: string;
@@ -87,23 +89,21 @@ export default function MyPage() {
     }
 
     try {
-      const res = await fetch("/api/myacount/language", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ language: selectedLanguage }),
-      });
-
-      if (!res.ok) {
-        setSaveStatus("保存に失敗しました");
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        setSaveStatus("ログインが必要です");
         return;
       }
-
+      await updateDoc(doc(db, "user", uid), { language: selectedLanguage });
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        localStorage.setItem("user", JSON.stringify({ ...user, language: selectedLanguage }));
+      }
       setAccount((prev) => (prev ? { ...prev, language: selectedLanguage } : prev));
       setSaveStatus("");
     } catch {
-      setSaveStatus("");
+      setSaveStatus("保存に失敗しました");
     }
   };
 
