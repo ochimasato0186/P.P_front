@@ -33,16 +33,30 @@ export default function HomePage() {
   useEffect(() => {
     const loadTitle = async () => {
       try {
-        const [accountRes, languageRes] = await Promise.all([
-          fetch("/myacount.json", { cache: "no-store" }),
-          fetch("/language.json", { cache: "no-store" }),
-        ]);
+        const languageRes = await fetch("/language.json", { cache: "no-store" });
+        if (!languageRes.ok) return;
 
-        if (!accountRes.ok || !languageRes.ok) return;
-
-        const accountData = await accountRes.json();
         const languageData = await languageRes.json();
-        const accountLanguage = (Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined)?.language;
+        let accountLanguage = "";
+
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser) as Account;
+            accountLanguage = parsed?.language ?? "";
+          } catch {
+            accountLanguage = "";
+          }
+        }
+
+        if (!accountLanguage) {
+          const accountRes = await fetch("/myacount.json", { cache: "no-store" });
+          if (accountRes.ok) {
+            const accountData = await accountRes.json();
+            accountLanguage =
+              (Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined)?.language ?? "";
+          }
+        }
 
         if (!accountLanguage || !Array.isArray(languageData)) return;
 

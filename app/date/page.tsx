@@ -33,18 +33,38 @@ export default function DatePage() {
   useEffect(() => {
     const loadAccuracyLabel = async () => {
       try {
-        const [accountRes, languageRes] = await Promise.all([
-          fetch("/myacount.json", { cache: "no-store" }),
-          fetch("/language.json", { cache: "no-store" }),
-        ]);
+        const languageRes = await fetch("/language.json", { cache: "no-store" });
+        if (!languageRes.ok) return;
 
-        if (!accountRes.ok || !languageRes.ok) return;
-
-        const accountData = await accountRes.json();
         const languageData = await languageRes.json();
-        const account = Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined;
-        const accountLanguage = account?.language;
-        const rawDate = account?.date;
+        let accountLanguage = "";
+        let rawDate = "";
+
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser) as Account;
+            accountLanguage = parsed?.language ?? "";
+            rawDate = parsed?.date ?? "";
+          } catch {
+            accountLanguage = "";
+            rawDate = "";
+          }
+        }
+
+        if (!accountLanguage || !rawDate) {
+          const accountRes = await fetch("/myacount.json", { cache: "no-store" });
+          if (accountRes.ok) {
+            const accountData = await accountRes.json();
+            const account = Array.isArray(accountData) ? (accountData[0] as Account | undefined) : undefined;
+            if (!accountLanguage) {
+              accountLanguage = account?.language ?? "";
+            }
+            if (!rawDate) {
+              rawDate = account?.date ?? "";
+            }
+          }
+        }
 
         if (typeof rawDate === "string" && rawDate.trim()) {
           const normalized = rawDate.trim().replace(/%$/, "");

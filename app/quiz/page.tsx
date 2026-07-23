@@ -63,7 +63,12 @@ export default function QuizPage() {
           }
         }
 
-        const response = await fetch(`/api/quiz/load?language=${encodeURIComponent(language)}`);
+        let response = await fetch(`/api/quiz/load?language=${encodeURIComponent(language)}`);
+        if (!response.ok && language !== "日本語") {
+          // 未対応言語が選択されている場合は日本語にフォールバック
+          response = await fetch(`/api/quiz/load?language=${encodeURIComponent("日本語")}`);
+        }
+
         if (!response.ok) {
           setError("問題の読み込みに失敗しました");
           setLoading(false);

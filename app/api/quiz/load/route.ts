@@ -28,13 +28,25 @@ type Question = TrueFalseQuestion | MultipleChoiceQuestion;
 
 const languageMap: Record<string, string> = {
   日本語: "nihongo",
-  英語: "eigo",
-  中国語: "chugoku",
-  ベトナム語: "betonamu",
-  韓国語: "kankoku",
-  タイ語: "tai",
-  スペイン語: "supein",
   関西弁: "kansai",
+
+  // Alias labels used in language.json / UI select values.
+  English: "eigo",
+  英語: "eigo",
+
+  中文: "chugoku",
+  中国語: "chugoku",
+
+  "Tiếng Việt": "betonamu",
+  ベトナム語: "betonamu",
+
+  "한국어": "kankoku",
+  韓国語: "kankoku",
+
+  "ภาษาไทย": "tai",
+  タイ語: "tai",
+
+  スペイン語: "supein",
 };
 
 function shuffleArray<T>(array: T[]): T[] {
